@@ -1,0 +1,55 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+board = [""] * 9
+current_player = "X"
+
+WIN_PATTERNS = [
+    [0,1,2], [3,4,5], [6,7,8],
+    [0,3,6], [1,4,7], [2,5,8],
+    [0,4,8], [2,4,6]
+]
+
+@app.route('/move', methods=['POST'])
+def move():
+    global current_player
+
+    data = request.json
+    pos = data['position']
+
+    if board[pos] != "":
+        return jsonify({"message": "Invalid Move"})
+
+    board[pos] = current_player
+
+    for pattern in WIN_PATTERNS:
+        a, b, c = pattern
+        if board[a] == board[b] == board[c] != "":
+            return jsonify({
+                "board": board,
+                "winner": current_player
+            })
+
+    if "" not in board:
+        return jsonify({
+            "board": board,
+            "winner": "Draw"
+        })
+
+    current_player = "O" if current_player == "X" else "X"
+
+    return jsonify({
+        "board": board,
+        "next_player": current_player
+    })
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global board, current_player
+    board = [""] * 9
+    current_player = "X"
+    return jsonify({"message": "Game Reset"})
+
+if __name__ == '__main__':
+    app.run(debug=True)
