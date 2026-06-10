@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tic Tac Toe Game</title>
+<style>
+body{font-family:Arial;text-align:center;margin-top:30px}
+.board{display:grid;grid-template-columns:repeat(3,100px);gap:5px;justify-content:center}
+.cell{
+width:100px;height:100px;border:1px solid #000;
+font-size:40px;display:flex;align-items:center;
+justify-content:center;cursor:pointer
+}
+button{margin-top:20px;padding:10px 20px}
+</style>
+</head>
+<body>
+
+<h1>🎮 Tic Tac Toe</h1>
+<h3 id="status">Player X Turn</h3>
+
+<div class="board" id="board"></div>
+<button onclick="restart()">Restart</button>
+
+<script>
+let board=["","","","","","","","",""];
+let player="X";
+let game=true;
+
+const wins=[
+[0,1,2],[3,4,5],[6,7,8],
+[0,3,6],[1,4,7],[2,5,8],
+[0,4,8],[2,4,6]
+];
+
+const gameBoard=document.getElementById("board");
+
+for(let i=0;i<9;i++){
+ let cell=document.createElement("div");
+ cell.className="cell";
+ cell.dataset.index=i;
+ cell.onclick=play;
+ gameBoard.appendChild(cell);
+}
+
+function play(){
+ let i=this.dataset.index;
+ if(board[i]!=="" || !game) return;
+
+ board[i]=player;
+ this.innerText=player;
+
+ for(let w of wins){
+   let[a,b,c]=w;
+   if(board[a]&&board[a]==board[b]&&board[b]==board[c]){
+      document.getElementById("status").innerText=player+" Wins 🎉";
+      game=false;
+      return;
+   }
+ }
+
+ if(!board.includes("")){
+   document.getElementById("status").innerText="Draw 🤝";
+   game=false;
+   return;
+ }
+
+ player=(player=="X")?"O":"X";
+ document.getElementById("status").innerText="Player "+player+" Turn";
+}
+
+function restart(){
+ board=["","","","","","","","",""];
+ player="X";
+ game=true;
+ document.getElementById("status").innerText="Player X Turn";
+ document.querySelectorAll(".cell").forEach(c=>c.innerText="");
+}
+</script>
+
+</body>
+</html>
